@@ -1,8 +1,11 @@
-﻿using Microsoft.Practices.ServiceLocation;
+﻿using Microsoft.Practices.Prism.PubSubEvents;
+using Microsoft.Practices.ServiceLocation;
+using PointOfSale.DataStructures;
 using PointOfSale.Interfaces;
 using PointOfSale.ViewModels;
 using PointOfSale.Views;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace PointOfSale
 {
@@ -14,7 +17,6 @@ namespace PointOfSale
         public MainWindow()
         {
             InitializeComponent();
-
 
             var view = new ProductsView();
             var viewModel = new ProductsViewModel(ServiceLocator.Current.GetInstance<IWebservice>());
@@ -29,26 +31,39 @@ namespace PointOfSale
 
             //MainContentRegion
             LetsHackThis.Content = view;
+
+            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<NavigateScreenEvent>().Subscribe(ScreenNavigate);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        public void ScreenNavigate(NavigateInfo navigationInfo)
         {
-            //Products
-
-            var view = new ProductsView();
-            var viewModel = new ProductsViewModel(ServiceLocator.Current.GetInstance<IWebservice>());
-            view.DataContext = viewModel;
-            LetsHackThis.Content = view;
+            var nextView = GetView(navigationInfo);
+            LetsHackThis.Content = nextView;
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private UserControl GetView(NavigateInfo navigationInfo)
         {
-            //Customers
+            switch (navigationInfo.ScreenName)
+            {
+                case "SelectCustomer":
+                    var view = new CustomersView();
+                    var viewModel = new CustomersViewModel(ServiceLocator.Current.GetInstance<IWebservice>(), navigationInfo.CurrentCart);
+                    view.DataContext = viewModel;
+                    return view;
+                case "ProductSelection":
+                    var productsView = new ProductsView();
+                    var productsViewModel = new ProductsViewModel(ServiceLocator.Current.GetInstance<IWebservice>(), navigationInfo.CurrentCart);
+                    productsView.DataContext = productsViewModel;
+                    return productsView;
+                case "CartCheckout":
+                    var cartView = new CartView();
+                    var cartViewModel = new CartViewModel(ServiceLocator.Current.GetInstance<IWebservice>(), navigationInfo.CurrentCart, navigationInfo.CurrentCustomer);
+                    cartView.DataContext = cartViewModel;
+                    return cartView;
+            }
 
-            var view = new CustomersView();
-            var viewModel = new CustomersViewModel(ServiceLocator.Current.GetInstance<IWebservice>());
-            view.DataContext = viewModel;
-            LetsHackThis.Content = view;
+            return null;
         }
+
     }
 }

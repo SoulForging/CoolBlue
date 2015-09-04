@@ -74,5 +74,8 @@
                 <Button  Grid.Column="4" Grid.Row="4" HorizontalAlignment="Right" Width="80" Content="{Binding SaveButtonHeading}" Command="{Binding AddUpdateCustomerCommand}" />
             </Grid>
         </Grid>
+        
+        <Button HorizontalAlignment="Left" Width="120" Content="Back" Grid.Row="9" VerticalAlignment="Bottom" Command="{Binding PrevCommand}" />
+        <Button HorizontalAlignment="Right" Width="120" Content="Continue Checkout" Grid.Row="9" VerticalAlignment="Bottom" Command="{Binding NextCommand}" />
     </Grid>
 </UserControl>

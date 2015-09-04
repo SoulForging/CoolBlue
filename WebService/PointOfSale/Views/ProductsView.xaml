@@ -113,6 +113,6 @@
             <TextBlock Text="{Binding CartCost}" />
         </StackPanel>
 
-        <Button Grid.Row="6" HorizontalAlignment="Right" Width="80">Checkout</Button>
+        <Button Grid.Row="6" HorizontalAlignment="Right" Width="80" Command="{Binding CheckoutCommand}">Checkout</Button>
     </Grid>
 </UserControl>

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.ComponentModel;
+using Microsoft.Practices.Prism.PubSubEvents;
 
 namespace PointOfSale
 {
@@ -31,11 +32,14 @@ namespace PointOfSale
                 var connectionString = System.Configuration.ConfigurationSettings.AppSettings.Get("webService");
                 IWebservice webService = new Webservice(connectionString);
 
+                EventAggregator eventAggregator = new EventAggregator();
+                unityContainer.RegisterInstance<IEventAggregator>(eventAggregator);
                 unityContainer.RegisterInstance<IWebservice>(webService);
 
                 var regionManager = new RegionManager();
                 regionManager.Regions.Add(new Region() { Name = "MainContentRegion" });
                 unityContainer.RegisterInstance<IRegionManager>(regionManager);
+
                 ServiceLocator.SetLocatorProvider(() => new UnityServiceLocator(unityContainer));
 
             }

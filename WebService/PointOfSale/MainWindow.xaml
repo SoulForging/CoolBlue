@@ -9,14 +9,10 @@
         Title="MainWindow" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="5" />
+            <RowDefinition Height="1" />
+            <RowDefinition Height="4" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-            <Button Width="80" Margin="5" Click="Button_Click">Products</Button>
-            <Button Width="80" Margin="5" Click="Button_Click_1">Customers</Button>
-        </StackPanel>
         
         <!--prism:RegionManager.RegionName="MainContentRegion"-->
         <ContentControl Grid.Row="2" x:Name="LetsHackThis" Margin="5" >

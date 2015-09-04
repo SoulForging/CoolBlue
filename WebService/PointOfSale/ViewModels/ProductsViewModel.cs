@@ -1,5 +1,6 @@
 ﻿using DataContracts.Models;
 using Microsoft.Practices.Prism.Commands;
+using Microsoft.Practices.Prism.PubSubEvents;
 using Microsoft.Practices.ServiceLocation;
 using PointOfSale.DataStructures;
 using PointOfSale.Interfaces;
@@ -7,9 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PointOfSale.ViewModels
@@ -103,17 +101,21 @@ namespace PointOfSale.ViewModels
             }
         }
 
-        public ProductsViewModel(IWebservice webService)
+        public ProductsViewModel(IWebservice webService, IEnumerable<CartItem> currentCart = null)
             : base(webService)
         {
             Initialize();
+
+            if (currentCart == null)
+                MyCart = new ObservableCollection<CartItem>();
+            else
+                MyCart = new ObservableCollection<CartItem>(currentCart);
         }
 
         private async void Initialize()
         {
             try
             {
-                MyCart = new ObservableCollection<CartItem>();
                 SalesComboDeals = new ObservableCollection<SalesDealContainer>();
                 SearchResults = await webService.GetAllProducts();
             }
@@ -129,6 +131,15 @@ namespace PointOfSale.ViewModels
                 SearchResults = await webService.GetAllProducts();
             else
                 SearchResults = await webService.SearchProducts(searchString);
+        }
+
+        private DelegateCommand checkoutCommand;
+        public DelegateCommand CheckoutCommand
+        {
+            get
+            {
+                return checkoutCommand ?? (checkoutCommand = new DelegateCommand(OnCheckout));
+            }
         }
 
         private DelegateCommand<Product> addToCartCommand;
@@ -207,25 +218,18 @@ namespace PointOfSale.ViewModels
             CartCost = MyCart.Sum(s => s.cartOrderLine.Price);
         }
 
-        //private async void OnSearch()
-        //{
-        //    using (var client = new HttpClient())
-        //    {
-        //        client.BaseAddress = new Uri("http://localhost:58781/");
-        //        client.DefaultRequestHeaders.Accept.Clear();
-        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        public void OnCheckout()
+        {
+            if (myCart.Count == 0)
+                return;
 
-        //        HttpResponseMessage response = await client.GetAsync("api/products");
+            NavigateInfo navigationInfo = new NavigateInfo()
+            {
+                ScreenName = "SelectCustomer",
+                CurrentCart = MyCart
+            };
 
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            SearchResults = await response.Content.ReadAsAsync<IEnumerable<Product>>();
-        //        }
-
-        //        //DataContractJsonSerializer
-        //        //Json.Net
-        //        //JsonConvert
-        //    }
-        //}
+            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<NavigateScreenEvent>().Publish(navigationInfo);
+        }
     }
 }

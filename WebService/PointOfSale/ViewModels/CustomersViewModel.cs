@@ -1,6 +1,10 @@
 ﻿using DataContracts.Models;
 using Microsoft.Practices.Prism.Commands;
+using Microsoft.Practices.Prism.PubSubEvents;
+using Microsoft.Practices.ServiceLocation;
+using PointOfSale.DataStructures;
 using PointOfSale.Interfaces;
+using System.Collections.Generic;
 
 namespace PointOfSale.ViewModels
 {
@@ -84,11 +88,31 @@ namespace PointOfSale.ViewModels
             }
         }
 
+        private DelegateCommand nextCommand;
+        public DelegateCommand NextCommand
+        {
+            get
+            {
+                return nextCommand ?? (nextCommand = new DelegateCommand(OnNextCommand));
+            }
+        }
 
-        public CustomersViewModel(IWebservice webService)
+        private DelegateCommand prevCommand;
+        public DelegateCommand PrevCommand
+        {
+            get
+            {
+                return prevCommand ?? (prevCommand = new DelegateCommand(OnPrevCommand));
+            }
+        }
+
+        private IEnumerable<CartItem> currentCart;
+
+        public CustomersViewModel(IWebservice webService, IEnumerable<CartItem> currentCart)
             : base(webService)
         {
             ExistingUser = true;
+            this.currentCart = currentCart;
         }
 
         public async void OnSearchForCustomer()
@@ -115,5 +139,31 @@ namespace PointOfSale.ViewModels
             }
         }
 
+
+        public void OnPrevCommand()
+        {
+            NavigateInfo navigationInfo = new NavigateInfo()
+            {
+                ScreenName = "ProductSelection",
+                CurrentCart = currentCart
+            };
+
+            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<NavigateScreenEvent>().Publish(navigationInfo);
+        }
+
+        public void OnNextCommand()
+        {
+            if (Customer == null || Customer.CustomerID <= 0)
+                return;
+
+            NavigateInfo navigationInfo = new NavigateInfo()
+            {
+                ScreenName = "CartCheckout",
+                CurrentCart = currentCart,
+                CurrentCustomer = Customer
+            };
+
+            ServiceLocator.Current.GetInstance<IEventAggregator>().GetEvent<NavigateScreenEvent>().Publish(navigationInfo);
+        }
     }
 }

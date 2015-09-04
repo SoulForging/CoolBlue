@@ -34,7 +34,7 @@
             <Grid Grid.Row="1" HorizontalAlignment="Stretch" Visibility="{Binding ExistingUser, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="Search: " HorizontalAlignment="Left" VerticalAlignment="Bottom" />
                 <TextBox Text="{Binding UserSearchText}" Height="20" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="50,0,80,0" />
-                <Button HorizontalAlignment="Right" Width="80">Search</Button>
+                <Button HorizontalAlignment="Right" Width="80" Command="{Binding SearchForCustomerCommand}">Search</Button>
             </Grid>
 
             <Grid Grid.Row="3" Visibility="{Binding HasCustomer, Converter={StaticResource BoolToVis}}">
@@ -71,7 +71,7 @@
                 <TextBlock Text="City" Grid.Row="3" Grid.Column="3" />
                 <TextBox Text="{Binding Customer.City}" Grid.Column="4" Grid.Row="3"/>
 
-                <Button  Grid.Column="4" Grid.Row="4" HorizontalAlignment="Right" Width="80" Content="{Binding SaveButtonHeading}" />
+                <Button  Grid.Column="4" Grid.Row="4" HorizontalAlignment="Right" Width="80" Content="{Binding SaveButtonHeading}" Command="{Binding AddUpdateCustomerCommand}" />
             </Grid>
         </Grid>
     </Grid>

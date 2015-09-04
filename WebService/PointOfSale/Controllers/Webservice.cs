@@ -11,10 +11,9 @@ using System.Threading.Tasks;
 
 namespace PointOfSale.Controllers
 {
-    public class Webservice : IWebservice
+    public partial class Webservice : IWebservice
     {
         protected static readonly ILog logger = LogManager.GetLogger(typeof(Webservice));
-
         private string connectionString;
 
         public Webservice(string connectionString)
@@ -29,6 +28,7 @@ namespace PointOfSale.Controllers
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
+        #region Products
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
             IEnumerable<Product> toReturn = null;
@@ -98,7 +98,9 @@ namespace PointOfSale.Controllers
 
             return toReturn;
         }
+        #endregion
 
+        #region Combo-Deals
         public async Task<IEnumerable<SalesCombination>> GetSalesCombinations(int ID)
         {
             IEnumerable<SalesCombination> toReturn = null;
@@ -121,7 +123,9 @@ namespace PointOfSale.Controllers
 
             return toReturn;
         }
+        #endregion
 
+        #region Customers
         public async Task<bool> UpdateCustomer(Customer toUpdate)
         {
             bool success = false;
@@ -176,7 +180,7 @@ namespace PointOfSale.Controllers
                 {
                     SetupClient(client);
 
-                    HttpResponseMessage response = await client.GetAsync("api/customers?search=" + searchString);
+                    HttpResponseMessage response = await client.GetAsync("api/customers?name=" + searchString);
 
                     if (response.IsSuccessStatusCode)
                         toReturn = await response.Content.ReadAsAsync<Customer>();
@@ -189,5 +193,6 @@ namespace PointOfSale.Controllers
 
             return toReturn;
         }
+        #endregion
     }
 }

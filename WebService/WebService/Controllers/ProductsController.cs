@@ -1,7 +1,9 @@
-﻿using DataContracts.Models;
+﻿using Dapper;
+using DataContracts.Models;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web.Http;
 
@@ -11,16 +13,31 @@ namespace WebService.Controllers
     {
         protected static readonly ILog logger = LogManager.GetLogger(typeof(ProductsController));
 
-        Product[] products = new Product[]
+        private IEnumerable<Product> GetProducts(string searchString = null)
         {
-            new Product { ProductID = 1, Name = "Tomato Soup", Price = 1 },
-            new Product { ProductID = 2, Name = "Yo-yo", Price = 3.75M },
-            new Product { ProductID = 3, Name = "Hammer", Price = 16.99M }
-        };
+            List<Product> toReturn = new List<Product>();
+            try
+            {
+                using (var msSql = DBController.GetDBConnection())
+                {
+                    DynamicParameters p = new DynamicParameters();
+                    if (!string.IsNullOrWhiteSpace(searchString))
+                        p.Add("SearchString", searchString);
+
+                    toReturn = msSql.Query<Product>("up_FindProducts", param: p, commandType: CommandType.StoredProcedure).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error retrieving DB products", ex);
+            }
+
+            return toReturn;
+        }
 
         public IEnumerable<Product> GetAllProducts()
         {
-            return products.Take(50);
+            return GetProducts().Take(50);
         }
 
         public IEnumerable<Product> GetProductsByName(string name)
@@ -29,7 +46,7 @@ namespace WebService.Controllers
 
             try
             {
-                toReturn = products.Where(s => s.Name.Contains(name)).ToList();
+                toReturn = GetProducts(name).Take(50).ToList();
             }
             catch (Exception ex)
             {

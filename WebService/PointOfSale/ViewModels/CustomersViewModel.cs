@@ -1,4 +1,5 @@
 ﻿using DataContracts.Models;
+using Microsoft.Practices.Prism.Commands;
 using PointOfSale.Interfaces;
 
 namespace PointOfSale.ViewModels
@@ -40,6 +41,18 @@ namespace PointOfSale.ViewModels
             }
         }
 
+
+        private string userSearchText;
+        public string UserSearchText
+        {
+            get { return userSearchText; }
+            set
+            {
+                userSearchText = value;
+                OnPropertyChanged();
+            }
+        }
+
         private Customer customer;
         public Customer Customer
         {
@@ -48,6 +61,26 @@ namespace PointOfSale.ViewModels
             {
                 customer = value;
                 OnPropertyChanged();
+                OnPropertyChanged("HasCustomer");
+            }
+        }
+
+        private DelegateCommand addUpdateCustomerCommand;
+        public DelegateCommand AddUpdateCustomerCommand
+        {
+            get
+            {
+                return addUpdateCustomerCommand ?? (addUpdateCustomerCommand = new DelegateCommand(OnAddUpdateCustomer));
+            }
+        }
+
+
+        private DelegateCommand searchForCustomerCommand;
+        public DelegateCommand SearchForCustomerCommand
+        {
+            get
+            {
+                return searchForCustomerCommand ?? (searchForCustomerCommand = new DelegateCommand(OnSearchForCustomer));
             }
         }
 
@@ -57,5 +90,30 @@ namespace PointOfSale.ViewModels
         {
             ExistingUser = true;
         }
+
+        public async void OnSearchForCustomer()
+        {
+            var result = await webService.SearchForCustomer(UserSearchText);
+
+            if (result != null)
+                Customer = result;
+            
+            //else show no user found
+        }
+
+        public async void OnAddUpdateCustomer()
+        {
+            if (ExistingUser)
+            {
+                var resultTwo = await webService.UpdateCustomer(Customer);
+                //TODO: messagedialog.mbox updated!
+            }
+            else
+            {
+                var result = await webService.AddCustomer(Customer);
+                Customer = result;
+            }
+        }
+
     }
 }

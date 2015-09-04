@@ -1,29 +1,80 @@
-﻿using DataContracts.Models;
+﻿using Dapper;
+using DataContracts.Models;
+using log4net;
 using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace WebService.Controllers
 {
     public class CustomersController : ApiController
     {
-        Customer[] products = new Customer[]
-        {
-            new Customer() { CustomerID=1, FirstName="Gin", LastName="Bottle", EmailAddress="GinTheAlcoholic@gmail.com", PostalCode="1778", City="Johannesburg", Housenumber="37", MiddleName="NA", Street="Shackles" },
-            new Customer() { CustomerID=2, FirstName="Jack", LastName="Daniels", EmailAddress="JackTheChamp@gmail.com", PostalCode="2001", City="Houston", Housenumber="1337", MiddleName="Om-Nom", Street="Homeless" },
-        };
+        protected static readonly ILog logger = LogManager.GetLogger(typeof(CustomersController));
 
-        public Customer Add(Customer toAdd)
+        public Customer PostAddCustomer(Customer toAdd)
         {
-            return null;
+            return AddOrUpdateCustomer(toAdd);
         }
 
-        public bool Update(Customer toUpdate)
+        public bool PutUpdateCustomer(Customer toUpdate)
         {
-            return false;
+            return AddOrUpdateCustomer(toUpdate) != null;
+        }
+
+        private Customer AddOrUpdateCustomer(Customer toAddOrUpdate)
+        {
+            Customer toReturn = null;
+            try
+            {
+                using (var msSql = DBController.GetDBConnection())
+                {
+                    DynamicParameters p = new DynamicParameters();
+                    p.Add("CustomerID", toAddOrUpdate.CustomerID);
+                    p.Add("FirstName", toAddOrUpdate.FirstName);
+                    p.Add("LastName", toAddOrUpdate.LastName);
+                    p.Add("MiddleName", toAddOrUpdate.MiddleName);
+                    p.Add("EmailAddress", toAddOrUpdate.EmailAddress);
+                    p.Add("Street", toAddOrUpdate.Street);
+                    p.Add("Housenumber", toAddOrUpdate.Housenumber);
+                    p.Add("PostalCode", toAddOrUpdate.PostalCode);
+                    p.Add("City", toAddOrUpdate.City);
+
+                    toReturn = msSql.Query<Customer>("up_AddOrUpdateCustomer", param: p, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error retrieving DB customer", ex);
+            }
+
+            return toReturn;
+        }
+
+        public Customer GetCustomerByName(string name)
+        {
+            return FindCustomer(name);
+        }
+
+        private Customer FindCustomer(string name)
+        {
+            Customer toReturn = null;
+            try
+            {
+                using (var msSql = DBController.GetDBConnection())
+                {
+                    DynamicParameters p = new DynamicParameters();
+                    p.Add("CustomerName", name);
+
+                    toReturn = msSql.Query<Customer>("up_FindCustomerByName", param: p, commandType: CommandType.StoredProcedure).FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error retrieving DB customer", ex);
+            }
+
+            return toReturn;
         }
     }
 }

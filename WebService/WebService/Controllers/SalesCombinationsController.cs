@@ -1,6 +1,9 @@
-﻿using DataContracts.Models;
+﻿using Dapper;
+using DataContracts.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,33 +13,39 @@ namespace WebService.Controllers
 {
     public class SalesCombinationsController : ApiController
     {
-        SalesCombination[] salesCombinations = new SalesCombination[]
-        {
-            new SalesCombination { SalesCombinationID = 1, MainProductID = 1, SubProductID = 2, Discount = 2 },
-            new SalesCombination { SalesCombinationID = 2, MainProductID = 1, SubProductID = 3, Discount = 2 },
-            new SalesCombination { SalesCombinationID = 3, MainProductID = 3, SubProductID = 4, Discount = 1.25m }
-        };
+        protected static readonly ILog logger = LogManager.GetLogger(typeof(ProductsController));
 
-        public IEnumerable<SalesCombination> GetAllSalesCombinations()
+        private IEnumerable<SalesCombination> GetSalesCombinationsWithProductID(int productID)
         {
-            return salesCombinations;
-        }
+            List<SalesCombination> toReturn = new List<SalesCombination>();
+            try
+            {
+                using (var msSql = DBController.GetDBConnection())
+                {
+                    DynamicParameters p = new DynamicParameters();
+                    p.Add("ProductID", productID);
 
-        public IEnumerable<SalesCombination> GetAllSalesCombinationsByProduct(int productID)
-        {
-            var toReturn = salesCombinations.Where(s => s.MainProductID == productID);
+                    toReturn = msSql.Query<SalesCombination>("up_FindSalesCombinationWithProductID", param: p, commandType: CommandType.StoredProcedure).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error finding sales combinations", ex);
+            }
 
             return toReturn;
         }
 
-        public IHttpActionResult GetSalesCombination(int id)
+        public IEnumerable<SalesCombination> GetAllSalesCombinations()
         {
-            var toReturn = salesCombinations.FirstOrDefault(s => s.SalesCombinationID == id);
+            return GetSalesCombinationsWithProductID(0);
+        }
 
-            if (toReturn == null)
-                return NotFound();
+        public IEnumerable<SalesCombination> GetAllSalesCombinationsByProduct(int productID)
+        {
+            var toReturn = GetSalesCombinationsWithProductID(productID);
 
-            return Ok(toReturn);
+            return toReturn;
         }
     }
 }

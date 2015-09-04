@@ -13,7 +13,8 @@ namespace WebService.Controllers
         SalesCombination[] salesCombinations = new SalesCombination[]
         {
             new SalesCombination { SalesCombinationID = 1, MainProductID = 1, SubProductID = 2, Discount = 2 },
-            new SalesCombination { SalesCombinationID = 2, MainProductID = 3, SubProductID = 4, Discount = 1.25m }
+            new SalesCombination { SalesCombinationID = 2, MainProductID = 1, SubProductID = 3, Discount = 2 },
+            new SalesCombination { SalesCombinationID = 3, MainProductID = 3, SubProductID = 4, Discount = 1.25m }
         };
 
         public IEnumerable<SalesCombination> GetAllSalesCombinations()
@@ -21,9 +22,16 @@ namespace WebService.Controllers
             return salesCombinations;
         }
 
+        public IEnumerable<SalesCombination> GetAllSalesCombinationsByProduct(int productID)
+        {
+            var toReturn = salesCombinations.Where(s => s.MainProductID == productID);
+
+            return toReturn;
+        }
+
         public IHttpActionResult GetSalesCombination(int id)
         {
-            var toReturn = salesCombinations.FirstOrDefault(s => s.MainProductID == id);
+            var toReturn = salesCombinations.FirstOrDefault(s => s.SalesCombinationID == id);
 
             if (toReturn == null)
                 return NotFound();

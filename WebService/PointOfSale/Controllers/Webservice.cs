@@ -61,7 +61,7 @@ namespace PointOfSale.Controllers
                 {
                     SetupClient(client);
 
-                    HttpResponseMessage response = await client.GetAsync("api/products/" + criteria);
+                    HttpResponseMessage response = await client.GetAsync("api/products?name=" + criteria);
 
                     if (response.IsSuccessStatusCode)
                         toReturn = await response.Content.ReadAsAsync<IEnumerable<Product>>();
@@ -99,24 +99,92 @@ namespace PointOfSale.Controllers
             return toReturn;
         }
 
-        public async Task<SalesCombination> GetSalesCombination(int ID)
+        public async Task<IEnumerable<SalesCombination>> GetSalesCombinations(int ID)
         {
-            SalesCombination toReturn = null;
+            IEnumerable<SalesCombination> toReturn = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     SetupClient(client);
 
-                    HttpResponseMessage response = await client.GetAsync("api/salescombinations/" + ID.ToString());
+                    HttpResponseMessage response = await client.GetAsync("api/salescombinations?productID=" + ID.ToString());
 
                     if (response.IsSuccessStatusCode)
-                        toReturn = await response.Content.ReadAsAsync<SalesCombination>();
+                        toReturn = await response.Content.ReadAsAsync<IEnumerable<SalesCombination>>();
                 }
             }
             catch (Exception ex)
             {
                 logger.Error(string.Format("Error loading sales combination [{0}]", ID), ex);
+            }
+
+            return toReturn;
+        }
+
+        public async Task<bool> UpdateCustomer(Customer toUpdate)
+        {
+            bool success = false;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    SetupClient(client);
+
+                    HttpResponseMessage response = await client.PutAsJsonAsync<Customer>("api/customers", toUpdate);
+
+                    success = response.IsSuccessStatusCode;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error loading UpdateCustomer [{0}]", toUpdate.CustomerID), ex);
+            }
+
+            return success;
+        }
+
+        public async Task<Customer> AddCustomer(Customer toAdd)
+        {
+            Customer toReturn = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    SetupClient(client);
+
+                    HttpResponseMessage response = await client.PostAsJsonAsync<Customer>("api/customers", toAdd);
+
+                    if (response.IsSuccessStatusCode)
+                        toReturn = await response.Content.ReadAsAsync<Customer>();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error adding Customer"), ex);
+            }
+
+            return toReturn;
+        }
+
+        public async Task<Customer> SearchForCustomer(string searchString)
+        {
+            Customer toReturn = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    SetupClient(client);
+
+                    HttpResponseMessage response = await client.GetAsync("api/customers?search=" + searchString);
+
+                    if (response.IsSuccessStatusCode)
+                        toReturn = await response.Content.ReadAsAsync<Customer>();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error searching for Customer"), ex);
             }
 
             return toReturn;

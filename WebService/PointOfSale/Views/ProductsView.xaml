@@ -21,17 +21,17 @@
         <TextBlock Text="Products" FontSize="42" />
 
         <TextBlock Text="Search" HorizontalAlignment="Right" Margin="5,5,210,5" VerticalAlignment="Bottom" />
-        <TextBox HorizontalAlignment="Right" Width="200" Height="20" VerticalAlignment="Bottom" Margin="5" />
+        <TextBox HorizontalAlignment="Right" Width="200" Height="20" VerticalAlignment="Bottom" Margin="5" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <Border BorderBrush="Black" Grid.Row="2" BorderThickness="2">
             <ScrollViewer Grid.Row="2">
-                <ItemsControl Grid.Row="2" ItemsSource="{Binding SearchResults}" MinHeight="150">
-                    <ItemsControl.ItemsPanel>
+                <ListBox Grid.Row="2" ItemsSource="{Binding SearchResults}" SelectedItem="{Binding SelectedProduct}" MinHeight="150">
+                    <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border BorderBrush="Blue" BorderThickness="2" CornerRadius="5" Margin="10">
                                 <Grid Width="300" Height="100">
@@ -58,8 +58,8 @@
                                 </Grid>
                             </Border>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </ScrollViewer>
         </Border>
 

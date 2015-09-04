@@ -19,7 +19,7 @@ namespace PointOfSale.DataStructures
         {
             get
             {
-                return string.Format("Combo deal! Add the following item with your existing '{0}' at a ${1} discount!", MainProduct.Name, SalesCombination.Discount);
+                return string.Format("Combo deal! Buy both '{0}' and '{1}' with a ${2} discount!", MainProduct.Name, SubProduct.Name, SalesCombination.Discount);
             }
         }
 
@@ -27,7 +27,7 @@ namespace PointOfSale.DataStructures
         {
             get
             {
-                return SubProduct.Price - SalesCombination.Discount;
+                return MainProduct.Price + SubProduct.Price - SalesCombination.Discount;
             }
         }
     }

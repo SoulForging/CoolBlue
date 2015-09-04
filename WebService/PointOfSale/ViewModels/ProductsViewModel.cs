@@ -30,6 +30,19 @@ namespace PointOfSale.ViewModels
             }
         }
 
+        private Product selectedProduct;
+        public Product SelectedProduct
+        {
+            get { return selectedProduct; }
+            set
+            {
+                selectedProduct = value;
+                OnPropertyChanged();
+                LoadBundleDeals(value);
+            }
+        }
+
+
         private ObservableCollection<SalesDealContainer> salesComboDeals;
         public ObservableCollection<SalesDealContainer> SalesComboDeals
         {
@@ -55,6 +68,19 @@ namespace PointOfSale.ViewModels
             }
         }
 
+        private string searchText;
+        public string SearchText
+        {
+            get { return searchText; }
+            set
+            {
+                searchText = value;
+                OnPropertyChanged();
+                //TODO: Throttle this call.
+                OnTextSearch(value);
+            }
+        }
+
         private int cartCount;
         public int CartCount
         {
@@ -77,9 +103,7 @@ namespace PointOfSale.ViewModels
             }
         }
 
-
-
-        public ProductsViewModel(IWebservice webService) 
+        public ProductsViewModel(IWebservice webService)
             : base(webService)
         {
             Initialize();
@@ -91,12 +115,20 @@ namespace PointOfSale.ViewModels
             {
                 MyCart = new ObservableCollection<CartItem>();
                 SalesComboDeals = new ObservableCollection<SalesDealContainer>();
-                SearchResults = await webService.SearchProducts("Tom");//.GetAllProducts();
+                SearchResults = await webService.GetAllProducts();
             }
             catch (Exception ex)
             {
                 logger.Error("Error initializing ProductsViewModel", ex);
             }
+        }
+
+        private async void OnTextSearch(string searchString)
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                SearchResults = await webService.GetAllProducts();
+            else
+                SearchResults = await webService.SearchProducts(searchString);
         }
 
         private DelegateCommand<Product> addToCartCommand;
@@ -115,20 +147,21 @@ namespace PointOfSale.ViewModels
             if (existingBasket != null)
                 existingBasket.AddOne();
             else
-            {
                 MyCart.Add(new CartItem(productToAdd));
-                LoadBundleDeal(productToAdd);
-            }
 
             CartCount = MyCart.Sum(s => s.cartOrderLine.Quantity);
             CartCost = MyCart.Sum(s => s.cartOrderLine.Price);
         }
 
-        private async void LoadBundleDeal(Product productDealToFind)
+        private async void LoadBundleDeals(Product productDealToFind)
         {
-            var deal = await webService.GetSalesCombination(productDealToFind.ProductID);
+            salesComboDeals.Clear();
+            if (productDealToFind == null)
+                return;
 
-            if (deal != null)
+            var deals = await webService.GetSalesCombinations(productDealToFind.ProductID);
+
+            foreach (var deal in deals)
             {
                 Product subProduct = await getProduct(deal.SubProductID);
                 if (subProduct == null) //If the product doesnt exist, the deal cannot exist

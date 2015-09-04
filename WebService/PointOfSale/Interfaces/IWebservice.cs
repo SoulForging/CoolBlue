@@ -10,6 +10,10 @@ namespace PointOfSale.Interfaces
         Task<IEnumerable<Product>> GetAllProducts();
         Task<IEnumerable<Product>> SearchProducts(string criteria);
 
-        Task<SalesCombination> GetSalesCombination(int ID);
+        Task<IEnumerable<SalesCombination>> GetSalesCombinations(int ID);
+
+        Task<bool> UpdateCustomer(Customer toUpdate);
+        Task<Customer> AddCustomer(Customer toAdd);
+        Task<Customer> SearchForCustomer(string searchString);
     }
 }

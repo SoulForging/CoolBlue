@@ -107,11 +107,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controllers\EmailMessaging.cs" />
     <Compile Include="Controllers\Webservice.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="DataStructures\CartItem.cs" />
     <Compile Include="DataStructures\NavigateScreenEvent.cs" />
     <Compile Include="DataStructures\SalesDealContainer.cs" />
+    <Compile Include="Interfaces\IMessaging.cs" />
     <Compile Include="Interfaces\IWebservice.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\CartViewModel.cs" />

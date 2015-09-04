@@ -36,6 +36,9 @@ namespace PointOfSale
                 unityContainer.RegisterInstance<IEventAggregator>(eventAggregator);
                 unityContainer.RegisterInstance<IWebservice>(webService);
 
+                IMessaging emailMessenger = new EmailMessaging();
+                unityContainer.RegisterInstance<IMessaging>(emailMessenger);
+
                 var regionManager = new RegionManager();
                 regionManager.Regions.Add(new Region() { Name = "MainContentRegion" });
                 unityContainer.RegisterInstance<IRegionManager>(regionManager);

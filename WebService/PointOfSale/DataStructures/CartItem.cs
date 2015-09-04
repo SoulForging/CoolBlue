@@ -16,7 +16,7 @@ namespace PointOfSale.DataStructures
             {
                 ProductID = product.ProductID,
                 Quantity = 1,
-                Price = price
+                Price = Price
             };
         }
 
@@ -27,11 +27,11 @@ namespace PointOfSale.DataStructures
             {
                 ProductID = cartDiscountDeal.SubProduct.ProductID,
                 Quantity = 1,
-                Price = price
+                Price = Price
             };
         }
 
-        private decimal price
+        public decimal Price
         {
             get
             {
@@ -42,12 +42,22 @@ namespace PointOfSale.DataStructures
             }
         }
 
+
         public void AddOne()
         {
             cartOrderLine.Quantity++;
-            cartOrderLine.Price = cartOrderLine.Quantity * price;
+            cartOrderLine.Price = cartOrderLine.Quantity * Price;
         }
 
-
+        public string CartSingleHeading
+        {
+            get
+            {
+                if (cartProduct != null)
+                    return string.Format("{0}x {1}", cartOrderLine.Quantity, cartProduct.Name);
+                else
+                    return string.Format("{0}x {1} AND {2} Combo", cartOrderLine.Quantity, cartDiscountDeal.MainProduct.Name, cartDiscountDeal.SubProduct.Name);
+            }
+        }
     }
 }

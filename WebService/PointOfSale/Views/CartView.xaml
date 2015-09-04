@@ -12,9 +12,28 @@
                 <RowDefinition Height="50" />
                 <RowDefinition Height="5" />
                 <RowDefinition Height="5*" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="20" />
             </Grid.RowDefinitions>
 
             <TextBlock Text="Cart Summary" FontSize="42" />
+
+            <Border BorderBrush="Black" Grid.Row="2" BorderThickness="2">
+                <ScrollViewer Grid.Row="4">
+                    <ItemsControl Grid.Row="4" ItemsSource="{Binding MyCart}" MinHeight="150">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock HorizontalAlignment="Left" FontWeight="Bold" Text="{Binding CartSingleHeading}" />
+                                    <TextBlock HorizontalAlignment="Right" FontWeight="Bold" Text="{Binding Price}" Margin="0,0,15,0" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+            
+            <Button Content="Send Invoice" Grid.Row="4" Width="120" HorizontalAlignment="Right" Command="{Binding SendInvoiceCommand}" />
         </Grid>
     </Grid>
 </UserControl>

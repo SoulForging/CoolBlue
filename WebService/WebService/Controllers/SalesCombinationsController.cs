@@ -10,17 +10,25 @@ namespace WebService.Controllers
 {
     public class SalesCombinationsController : ApiController
     {
+        SalesCombination[] salesCombinations = new SalesCombination[]
+        {
+            new SalesCombination { SalesCombinationID = 1, MainProductID = 1, SubProductID = 2, Discount = 2 },
+            new SalesCombination { SalesCombinationID = 2, MainProductID = 3, SubProductID = 4, Discount = 1.25m }
+        };
 
         public IEnumerable<SalesCombination> GetAllSalesCombinations()
         {
-            return null;
+            return salesCombinations;
         }
 
         public IHttpActionResult GetSalesCombination(int id)
         {
-            return NotFound();
-            //return Ok(null);
-        }
+            var toReturn = salesCombinations.FirstOrDefault(s => s.MainProductID == id);
 
+            if (toReturn == null)
+                return NotFound();
+
+            return Ok(toReturn);
+        }
     }
 }

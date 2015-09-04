@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Microsoft.Practices.Prism.Regions;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using PointOfSale.Controllers;
@@ -10,6 +11,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.ComponentModel;
 
 namespace PointOfSale
 {
@@ -28,8 +30,12 @@ namespace PointOfSale
 
                 var connectionString = System.Configuration.ConfigurationSettings.AppSettings.Get("webService");
                 IWebservice webService = new Webservice(connectionString);
+
                 unityContainer.RegisterInstance<IWebservice>(webService);
 
+                var regionManager = new RegionManager();
+                regionManager.Regions.Add(new Region() { Name = "MainContentRegion" });
+                unityContainer.RegisterInstance<IRegionManager>(regionManager);
                 ServiceLocator.SetLocatorProvider(() => new UnityServiceLocator(unityContainer));
 
             }

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PointOfSale"
+        xmlns:prism="http://www.codeplex.com/prism"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800">
     <Grid>
@@ -13,10 +14,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <Button Width="80" Margin="5">Products</Button>
-            <Button Width="80" Margin="5">Customers</Button>
+            <Button Width="80" Margin="5" Click="Button_Click">Products</Button>
+            <Button Width="80" Margin="5" Click="Button_Click_1">Customers</Button>
         </StackPanel>
-        <ContentControl Grid.Row="2" x:Name="LetsHackThis" Margin="5">
+        
+        <!--prism:RegionManager.RegionName="MainContentRegion"-->
+        <ContentControl Grid.Row="2" x:Name="LetsHackThis" Margin="5" >
             
         </ContentControl>
     </Grid>

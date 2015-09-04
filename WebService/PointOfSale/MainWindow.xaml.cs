@@ -1,19 +1,8 @@
-﻿using PointOfSale.ViewModels;
+﻿using Microsoft.Practices.ServiceLocation;
+using PointOfSale.Interfaces;
+using PointOfSale.ViewModels;
 using PointOfSale.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PointOfSale
 {
@@ -26,10 +15,39 @@ namespace PointOfSale
         {
             InitializeComponent();
 
+
             var view = new ProductsView();
-            var viewModel = new ProductsViewModel();
+            var viewModel = new ProductsViewModel(ServiceLocator.Current.GetInstance<IWebservice>());
             view.DataContext = viewModel;
 
+            //var regionManager = ServiceLocator.Current.GetInstance<IRegionManager>();
+            //regionManager.RegisterViewWithRegion("MainContentRegion", typeof(ProductsView));
+
+            //this.regionManager.RegisterViewWithRegion()
+            //var productsUri = new Uri("/Views/ProductsView", UriKind.Relative);
+            //regionManager.RequestNavigate("MainContentRegion", productsUri);
+
+            //MainContentRegion
+            LetsHackThis.Content = view;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //Products
+
+            var view = new ProductsView();
+            var viewModel = new ProductsViewModel(ServiceLocator.Current.GetInstance<IWebservice>());
+            view.DataContext = viewModel;
+            LetsHackThis.Content = view;
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            //Customers
+
+            var view = new CustomersView();
+            var viewModel = new CustomersViewModel(ServiceLocator.Current.GetInstance<IWebservice>());
+            view.DataContext = viewModel;
             LetsHackThis.Content = view;
         }
     }

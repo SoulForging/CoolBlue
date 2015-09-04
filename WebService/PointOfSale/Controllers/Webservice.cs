@@ -1,4 +1,5 @@
 ﻿using DataContracts.Models;
+using log4net;
 using PointOfSale.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace PointOfSale.Controllers
 {
     public class Webservice : IWebservice
     {
+        protected static readonly ILog logger = LogManager.GetLogger(typeof(Webservice));
+
         private string connectionString;
 
         public Webservice(string connectionString)
@@ -29,14 +32,21 @@ namespace PointOfSale.Controllers
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
             IEnumerable<Product> toReturn = null;
-            using (var client = new HttpClient())
+            try
             {
-                SetupClient(client);
+                using (var client = new HttpClient())
+                {
+                    SetupClient(client);
 
-                HttpResponseMessage response = await client.GetAsync("api/products");
+                    HttpResponseMessage response = await client.GetAsync("api/products");
 
-                if (response.IsSuccessStatusCode)
-                    toReturn = await response.Content.ReadAsAsync<IEnumerable<Product>>();
+                    if (response.IsSuccessStatusCode)
+                        toReturn = await response.Content.ReadAsAsync<IEnumerable<Product>>();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error retrieving all products", ex);
             }
 
             return toReturn;
@@ -45,14 +55,68 @@ namespace PointOfSale.Controllers
         public async Task<IEnumerable<Product>> SearchProducts(string criteria)
         {
             IEnumerable<Product> toReturn = null;
-            using (var client = new HttpClient())
+            try
             {
-                SetupClient(client);
+                using (var client = new HttpClient())
+                {
+                    SetupClient(client);
 
-                HttpResponseMessage response = await client.GetAsync("api/products/" + criteria);
+                    HttpResponseMessage response = await client.GetAsync("api/products/" + criteria);
 
-                if (response.IsSuccessStatusCode)
-                    toReturn = await response.Content.ReadAsAsync<IEnumerable<Product>>();
+                    if (response.IsSuccessStatusCode)
+                        toReturn = await response.Content.ReadAsAsync<IEnumerable<Product>>();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error searching for products: [{0}]", criteria), ex);
+            }
+
+            return toReturn;
+        }
+
+        public async Task<Product> GetProduct(int ID)
+        {
+            Product toReturn = null;
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    SetupClient(client);
+
+                    HttpResponseMessage response = await client.GetAsync("api/products/" + ID.ToString());
+
+                    if (response.IsSuccessStatusCode)
+                        toReturn = await response.Content.ReadAsAsync<Product>();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error loading product {0}", ID), ex);
+            }
+
+            return toReturn;
+        }
+
+        public async Task<SalesCombination> GetSalesCombination(int ID)
+        {
+            SalesCombination toReturn = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    SetupClient(client);
+
+                    HttpResponseMessage response = await client.GetAsync("api/salescombinations/" + ID.ToString());
+
+                    if (response.IsSuccessStatusCode)
+                        toReturn = await response.Content.ReadAsAsync<SalesCombination>();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(string.Format("Error loading sales combination [{0}]", ID), ex);
             }
 
             return toReturn;

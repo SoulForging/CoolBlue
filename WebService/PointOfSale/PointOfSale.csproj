@@ -104,9 +104,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controllers\Webservice.cs" />
-    <Compile Include="Controls\ProductControl.xaml.cs">
-      <DependentUpon>ProductControl.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="DataStructures\CartItem.cs" />
+    <Compile Include="DataStructures\SalesDealContainer.cs" />
     <Compile Include="Interfaces\IWebservice.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\CustomersViewModel.cs" />
@@ -117,10 +117,6 @@
     <Compile Include="Views\ProductsView.xaml.cs">
       <DependentUpon>ProductsView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Controls\ProductControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

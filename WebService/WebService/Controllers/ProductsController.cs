@@ -1,15 +1,16 @@
 ﻿using DataContracts.Models;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace WebService.Controllers
 {
     public class ProductsController : ApiController
     {
+        protected static readonly ILog logger = LogManager.GetLogger(typeof(ProductsController));
+
         Product[] products = new Product[]
         {
             new Product { ProductID = 1, Name = "Tomato Soup", Price = 1 },
@@ -19,7 +20,7 @@ namespace WebService.Controllers
 
         public IEnumerable<Product> GetAllProducts()
         {
-            return products;
+            return products.Take(50);
         }
 
         public IEnumerable<Product> GetProductsByName(string name)
@@ -32,7 +33,7 @@ namespace WebService.Controllers
             }
             catch (Exception ex)
             {
-                //TODO: Log4net
+                logger.Error(string.Format("Error Retrieving products by name: [{0}]", name), ex);
             }
 
             return toReturn;
